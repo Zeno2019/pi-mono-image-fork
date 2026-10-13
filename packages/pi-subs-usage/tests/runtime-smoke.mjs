@@ -7,7 +7,7 @@ import { stripVTControlCharacters } from "node:util";
 import { InMemoryCredentialStore } from "@earendil-works/pi-ai";
 import {
   createAgentSession, DefaultResourceLoader, FooterComponent, initTheme, ModelRegistry,
-  ModelRuntime, SessionManager, SettingsManager,
+  ModelRuntime, SessionManager, SettingsManager, VERSION,
 } from "@earendil-works/pi-coding-agent";
 import subsUsage from "../index.ts";
 import { resolveUsageRequest } from "../src/auth.ts";
@@ -266,5 +266,5 @@ export async function runtimeSmoke() {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   await runtimeSmoke();
-  console.log("PASS: Pi 1.1.0 background preload, cached provider/model switches, per-model auth isolation, command-auth rejection, Codex OAuth refresh/logout, footer rendering and commands (synthetic credentials, mocked HTTP).");
+  console.log(`PASS: Pi ${VERSION} background preload, cached provider/model switches, per-model auth isolation, command-auth rejection, Codex OAuth refresh/logout, footer rendering and commands (synthetic credentials, mocked HTTP).`);
 }

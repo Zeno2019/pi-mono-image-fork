@@ -18,7 +18,7 @@ you trust. For eligible non-command configurations this package uses Pi's public
 trusted configuration, and OAuth refresh. The package does not directly read
 project configuration, execute processes, or implement its own credential refresh.
 
-Pi 1.1's public resolver can execute configured commands synchronously. An isolated
+The public auth resolver in Pi 1.1 and 1.2 can execute configured commands synchronously. An isolated
 read-only compatibility adapter checks its already-loaded provider/model configuration,
 registered extension configuration, and raw credential metadata before quota auth.
 Pi's private `ModelRegistry.runtime`, `ModelRuntime.config`/`credentials`, and

@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import test from "node:test";
 import { InMemoryCredentialStore } from "@earendil-works/pi-ai";
-import { ModelRegistry, ModelRuntime } from "@earendil-works/pi-coding-agent";
+import { ModelRegistry, ModelRuntime, VERSION } from "@earendil-works/pi-coding-agent";
 import subsUsage from "../index.ts";
 import { assertBackgroundAuthSafe } from "../src/background-auth.ts";
 import { resolveUsageRequest } from "../src/auth.ts";
@@ -82,6 +82,23 @@ async function setup(t, configure) {
     },
   };
 }
+
+test(`Pi ${VERSION}: real entrypoint accepts safe background auth on supported release lines`, async t => {
+  assert.match(VERSION, /^1\.(?:1|2)\.\d+$/, "Run this contract suite against stable Pi 1.1 and 1.2");
+  const h = await setup(t, () => ({ providers: {
+    "opencode-go": { ...goConfig([{ id: "safe" }]), apiKey: go.token },
+  } }));
+  const fetch = t.mock.method(globalThis, "fetch", async (_url, init) => {
+    assert.equal(init.headers.Authorization, `Bearer ${go.token}`);
+    return Response.json(go.payload);
+  });
+  h.emit("session_start");
+  await h.refresh();
+  assert.match(h.status(h.models[0]), /^\[5h/);
+  assert.equal(h.auth.mock.callCount(), 1);
+  assert.equal(fetch.mock.callCount(), 1);
+  assert.equal(await h.commandCount(), 0);
+});
 
 test("real Pi entrypoint skips seven inactive slow key commands on startup and repeated polls", async t => {
   const h = await setup(t, command => ({ providers: {
