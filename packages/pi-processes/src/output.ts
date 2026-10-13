@@ -40,6 +40,14 @@ export class OutputBuffer {
     return { output: Buffer.concat(pieces).toString("utf8"), dropped_bytes, unread_bytes: this.bytes };
   }
 
+  /** Non-consuming tail for completion and human inspection. */
+  tail(maxBytes: number): { output: string; dropped_bytes: number; unread_bytes: number } {
+    const bytes = Buffer.concat(this.chunks.slice(this.head).map((chunk, i) => i ? chunk : chunk.subarray(this.offset)));
+    let start = Math.max(0, bytes.length - maxBytes);
+    while (start < bytes.length && (bytes[start] & 0xc0) === 0x80) start++;
+    return { output: bytes.subarray(start).toString("utf8"), dropped_bytes: this.dropped + start, unread_bytes: 0 };
+  }
+
   private consume(count: number): void {
     this.bytes -= count;
     while (count > 0) {

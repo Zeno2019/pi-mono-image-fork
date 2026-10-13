@@ -132,7 +132,7 @@ test("structured codemode results and terminal sanitization survive the real too
   assert.doesNotMatch(textOf(result), /\\u001b|\\u0007/);
 });
 
-test("a background completion queues metadata without an unsolicited provider turn", async t => {
+test("legacy default completion is silent even on the next prompt; final output remains available", async t => {
   const h = await processes(t);
   const launch = dataOf(await h.run("exec_command", {
     cmd: "sleep 0.2; printf private-completion-output", yield_time_ms: 0,
@@ -140,9 +140,10 @@ test("a background completion queues metadata without an unsolicited provider tu
   await delay(400);
   await h.run("process_list", {});
   const completion = h.session.messages.filter(message => message.customType === "pi-processes-completed");
-  assert.equal(completion.length, 1);
-  assert.ok(JSON.stringify(completion[0]).includes(launch.session_id));
-  assert.ok(!JSON.stringify(completion[0]).includes("private-completion-output"));
+  assert.equal(completion.length, 0);
+  const output = dataOf(await h.run("process_output", { session_id: launch.session_id }));
+  assert.equal(output.output, "private-completion-output");
+  assert.equal(output.status, "exited");
 });
 
 test("turn cancellation releases an input dialog even when UI ignores abort; late approval cannot write", async t => {

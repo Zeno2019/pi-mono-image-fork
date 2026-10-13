@@ -9,7 +9,10 @@
 - Bound active processes, retained records, output, input, waits, and timeouts. Report output loss explicitly.
 - Initial-call cancellation stops its new process; polling cancellation stops the wait only.
 - Kill session-owned process groups on timeout, shutdown, reload, and normal Node exit. Never target arbitrary model-supplied PIDs.
-- Default/legacy completion messages contain status metadata only. Explicit completion modes may deliver a bounded, sanitized, untrusted output tail without consuming polling output; wake the model only when requested. Never attach command or input arguments.
+- Default execution and legacy short waits are silent on completion. Explicit background mode arms task-scoped delivery; keep transport facts separate from scheduling and acknowledgment. Do not queue stale task results or duplicate finalized observations.
+- Never count a nested result as provider-visible without explicit acknowledgment. Preserve legacy explicit completion options, but guide models toward modes instead of host delivery mechanics.
+- Bound private temporary logs, completion tails, aggregate result batches, and every visible preview. Readers and UI must not consume each other's output. Never accept caller-supplied log paths.
+- Model completion messages are hidden in the visible conversation. Use renderers, lifecycle-driven status and `/processes` for human feedback; do not attach command/input arguments to completion context.
 - Keep the widget terminal-only, detached-process-only, and output-free. Drive membership from lifecycle events, not model/tool polling; stop its clock and clear only its own slot on teardown.
 - This is local execution, not a sandbox. DCG startup coverage belongs in `pi-dcg`; never claim DCG validates incremental stdin.
 
