@@ -2,6 +2,25 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-13
+
+### Added
+
+- Explicit foreground, background and service modes. Background commands deliver bounded output automatically at safe model boundaries and resume the requesting task without model-driven polling.
+- Task-scoped completion coordination, batched results, finalized observation tracking, and explicit codemode acknowledgment. New user input or abort disarms old automatic delivery without stopping processes.
+- Non-consuming `process_output` with independent byte cursors and a latest-output tail; event-driven `process_wait` for any/all dependencies, released by queued user input.
+- Private temporary output storage, capped at 8 MiB per process and 32 MiB per runtime, plus independent 64,000-byte tails. Clean storage on eviction and orderly teardown.
+- `/processes` output/stop panel with bounded pages, horizontal navigation, cursor segments, refresh and tail views, without model calls.
+- Four-line collapsed process output, bounded expansion, compact status/loss summaries and historical completion rendering. Apply the same renderers to legacy empty `write_stdin` polls.
+- Conservative validation provenance when Pi file-editing tools run during a command, and bounded foreground progress updates.
+
+### Changed
+
+- Default completion is silent: no delayed metadata backlog in conversation or model context. Automatic background results are model context, not visible bookkeeping messages.
+- Foreground execution waits for final results by default. An explicit legacy `yield_time_ms` retains the earlier attachment behavior.
+- Tool descriptions and parameter documentation express dependency-driven execution choices, independent work, readiness limits and the automatic delivery contract.
+- Bound the live widget to three process rows; show brief completion feedback and retain failed-result attention status until inspection.
+
 ## [0.2.0] - 2026-10-12
 
 ### Added

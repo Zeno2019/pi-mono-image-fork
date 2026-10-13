@@ -1,6 +1,6 @@
 {
   "name": "pi-processes",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Codex-inspired process execution for Pi on macOS and Linux.",
   "type": "module",
   "license": "MIT",

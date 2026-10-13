@@ -195,3 +195,25 @@ test("cancelled queued reader returns promptly without overtaking the first read
   assert.equal(thirdCalled, false);
   await Promise.all([first, third]);
 });
+
+test("retained-record admission never evicts pinned readers or grows beyond its cap", async t => {
+  const rt = fixture(t);
+  const ids = [];
+  for (let i = 0; i < 3; i++) ids.push((await start(rt, "printf retained")).session_id);
+  const release = rt.hold(ids);
+  await assert.rejects(start(rt, "printf rejected"), /process records can be retained/);
+  assert.equal(rt.list().length, 3);
+  assert.equal(rt.output(ids[0], 0, 1024).output, "retained");
+  release();
+  await start(rt, "printf admitted");
+  assert.equal(rt.list().length, 3);
+  assert.throws(() => rt.output(ids[0], 0, 1024), /Unknown/);
+});
+
+test("concurrent launch reservations also obey the retained-record cap", async t => {
+  const rt = fixture(t, undefined, { active: 8, retained: 2 });
+  const jobs = await Promise.allSettled([1, 2, 3].map(() => start(rt, "sleep 30", { wait: 0 })));
+  assert.equal(jobs.filter(j => j.status === "fulfilled").length, 2);
+  assert.equal(jobs.filter(j => j.status === "rejected").length, 1);
+  assert.equal(rt.list().length, 2);
+});
