@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-13
+
 ### Added
 
 - Explicit foreground, background and service modes. Background commands deliver bounded output automatically at safe model boundaries and resume the requesting task without model-driven polling.

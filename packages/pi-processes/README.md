@@ -18,18 +18,18 @@ The tool names and lifecycle are inspired by [OpenAI Codex](https://github.com/o
 
 ## Install
 
-The explicit modes, output/wait tools and process panel described below are unreleased. Published 0.2.0 has the legacy interface; use a local checkout to try these changes.
+Version 0.3 changes the default to foreground execution and silent completion. Use explicit background mode for finite work that can overlap other actions. Existing calls with `yield_time_ms` retain the legacy attachment behavior. Commands now retain bounded output in private temporary storage; see [SECURITY.md](SECURITY.md).
 
 Install the package:
 
 ```bash
-pi install npm:pi-processes@0.2.0
+pi install npm:pi-processes@0.3.0
 ```
 
 For DCG startup protection, also install the companion guard release:
 
 ```bash
-pi install npm:pi-dcg@0.4.0
+pi install npm:pi-dcg@0.4.1
 ```
 
 `pi-dcg` requires a separately installed `dcg` executable. Its default bridge failure policy is fail-open; start Pi with `PI_DCG_ON_ERROR=block` to block startup when checks cannot run.
@@ -233,7 +233,7 @@ Manual smoke test on both platforms:
 
 The widget uses public Pi UI APIs. No editor/footer replacement or private Pi API patch is used.
 
-Additional smoke checks for this unreleased interface:
+Additional smoke checks for the execution modes and process UI:
 
 1. Start a finite background test with a title, then do independent read-only work. Verify the result reaches the next safe continuation without polling or a visible JSON completion card.
 2. Start two independent foreground commands in one tool batch. Verify their lifetimes overlap; do not use concurrently mutating validation inputs.
