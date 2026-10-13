@@ -18,13 +18,16 @@ you trust. For eligible non-command configurations this package uses Pi's public
 trusted configuration, and OAuth refresh. The package does not directly read
 project configuration, execute processes, or implement its own credential refresh.
 
-Pi 1.1's public resolver can execute configured commands synchronously. An isolated
+The public auth resolver in Pi 1.1 and 1.2 can execute configured commands synchronously. An isolated
 read-only compatibility adapter checks its already-loaded provider/model configuration,
 registered extension configuration, and raw credential metadata before quota auth.
 Pi's private `ModelRegistry.runtime`, `ModelRuntime.config`/`credentials`, and
 `AuthStorage.readLatestData` are needed because public auth resolution hides these
 inputs or executes them. No host methods or configuration are patched. Unsupported
-Pi release lines and incompatible private shapes fail closed with a fixed status.
+Pi major versions, prereleases, and incompatible private shapes fail closed with a fixed status.
+Stable Pi 1.x releases are accepted without a minor-version allowlist. Runtime shape
+checks cannot detect changed auth behavior that preserves the same private shape;
+accepting future minor releases trades individual release verification for compatibility.
 This contract is covered by real-host regression and render/smoke tests.
 
 Configured `!command` provider keys, provider/model headers, and stored API keys

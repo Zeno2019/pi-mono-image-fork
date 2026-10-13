@@ -25,7 +25,7 @@ From this repository:
 pi -e ./packages/pi-subs-usage/index.ts
 ```
 
-Developed and contract-tested with Pi **1.1.0** and Node.js **>=22.19.0**. The command-safety adapter supports Pi 1.1's internal metadata shape; other Pi release lines or incompatible metadata show `[background auth unavailable]` instead of attempting unsafe auth resolution.
+Contract-tested with Pi **1.1.0** and **1.2.0** and Node.js **>=22.19.0**. The command-safety adapter accepts stable Pi **1.x** releases without a minor-version allowlist and checks the required private metadata at runtime. Other major versions, prereleases, or incompatible metadata show `[background auth unavailable]` instead of attempting unsafe auth resolution. Future 1.x releases are accepted, not individually verified: runtime shape checks cannot detect a behavior change that preserves the same metadata shape.
 
 Use Pi's normal `/login` or provider API-key setup, then select a supported model. This package does not add model providers or change inference settings.
 
@@ -92,7 +92,7 @@ The extension keeps its text on the existing extension-status line and groups it
 
 ### Command-backed credentials
 
-Pi 1.1 resolves `!command` API keys and headers synchronously, which can freeze the editor during background polling. This package therefore skips affected models and shows `[command auth unsupported]`. This applies to startup, automatic polls, and manual refreshes; `/subs-usage` does not override it.
+Pi 1.1 and 1.2 resolve `!command` API keys and headers synchronously, which can freeze the editor during background polling. This package therefore skips affected models and shows `[command auth unsupported]`. This applies to startup, automatic polls, and manual refreshes; `/subs-usage` does not override it.
 
 The check covers configured provider keys and headers, hidden model-specific headers and overrides, extension-registered configuration, and stored API-key commands. A command header on one model does not disable other models with safe auth. Provider-level commands disable monitoring for that provider's models, conservatively including a configured key command that another credential could supersede. The native OpenAI fallback checks the Codex quota source, not unused native credentials.
 

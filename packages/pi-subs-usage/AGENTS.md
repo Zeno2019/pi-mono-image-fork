@@ -5,7 +5,7 @@
 - `extensions/index.ts` registers lifecycle events and `/subs-usage`.
 - `src/monitor.ts` owns a configured-model usage cache, bounded background polling, cancellation, and selected-model status publication.
 - `src/auth.ts` resolves each monitored model's effective Pi credential and fixed usage route.
-- `src/background-auth.ts` is the isolated, read-only Pi 1.1 compatibility adapter for rejecting configured key/header commands before invoking auth.
+- `src/background-auth.ts` is the isolated, read-only Pi 1.x compatibility adapter for rejecting configured key/header commands before invoking auth.
 - `src/http.ts` bounds read-only HTTP operations.
 - `src/parse.ts` normalizes provider-specific quota units; `src/format.ts` renders them.
 
