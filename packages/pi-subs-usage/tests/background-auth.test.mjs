@@ -7,7 +7,7 @@ import test from "node:test";
 import { InMemoryCredentialStore } from "@earendil-works/pi-ai";
 import { ModelRegistry, ModelRuntime, VERSION } from "@earendil-works/pi-coding-agent";
 import subsUsage from "../index.ts";
-import { assertBackgroundAuthSafe } from "../src/background-auth.ts";
+import { assertBackgroundAuthSafe, supportsBackgroundAuthVersion } from "../src/background-auth.ts";
 import { resolveUsageRequest } from "../src/auth.ts";
 import { STATUS_KEY } from "../src/monitor.ts";
 import { backgroundAuthMetadata, cases, legacyToken, model } from "./fixtures.mjs";
@@ -83,8 +83,17 @@ async function setup(t, configure) {
   };
 }
 
+test("background auth accepts stable Pi 1.x without a minor-version allowlist", () => {
+  for (const version of ["1.0.0", "1.1.0", "1.2.0", "1.3.0", "1.99.42"]) {
+    assert.equal(supportsBackgroundAuthVersion(version), true, version);
+  }
+  for (const version of ["0.99.0", "2.0.0", "11.0.0", "1.2", "1.2.0-beta.1", "v1.2.0", "1.2.0\n", ""]) {
+    assert.equal(supportsBackgroundAuthVersion(version), false, version);
+  }
+});
+
 test(`Pi ${VERSION}: real entrypoint accepts safe background auth on supported release lines`, async t => {
-  assert.match(VERSION, /^1\.(?:1|2)\.\d+$/, "Run this contract suite against stable Pi 1.1 and 1.2");
+  assert.equal(supportsBackgroundAuthVersion(VERSION), true, "Run this contract suite against stable Pi 1.x");
   const h = await setup(t, () => ({ providers: {
     "opencode-go": { ...goConfig([{ id: "safe" }]), apiKey: go.token },
   } }));

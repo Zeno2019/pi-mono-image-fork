@@ -5,6 +5,11 @@ import { UsageError } from "./types.js";
 
 export type BackgroundAuthRegistry = Pick<ModelRegistry, "getRegisteredProviderConfig">;
 
+/** Private metadata checks remain mandatory even on an accepted release. */
+export function supportsBackgroundAuthVersion(version: string): boolean {
+  return /^1\.\d+\.\d+$/.test(version) && version.trim() === version;
+}
+
 function command(value: unknown): boolean {
   return typeof value === "string" && value.startsWith("!");
 }
@@ -42,7 +47,7 @@ function checkConfiguration(runtime: Record<string, unknown>, registry: Backgrou
 }
 
 /**
- * Read-only Pi 1.1/1.2 compatibility boundary. Its public auth facade cannot check
+ * Read-only Pi 1.x compatibility boundary. Its public auth facade cannot check
  * for commands in hidden model headers or AuthStorage without resolving them.
  * Inspect the already-loaded config and raw credential store, never guessed
  * config paths. Unknown host shapes fail closed instead of risking execSync.
@@ -59,7 +64,7 @@ export async function assertBackgroundAuthSafe(
   const config = object(runtime.config);
   const credentials = object(runtime.credentials);
   const store = object(credentials.store);
-  if (!/^1\.(?:1|2)\.\d+$/.test(VERSION) || typeof config.getProvider !== "function"
+  if (!supportsBackgroundAuthVersion(VERSION) || typeof config.getProvider !== "function"
     || typeof registry.getRegisteredProviderConfig !== "function"
     || !(credentials.overrides instanceof Map) || typeof store.read !== "function") {
     throw unavailable();

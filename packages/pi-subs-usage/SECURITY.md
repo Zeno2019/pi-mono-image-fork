@@ -24,7 +24,10 @@ registered extension configuration, and raw credential metadata before quota aut
 Pi's private `ModelRegistry.runtime`, `ModelRuntime.config`/`credentials`, and
 `AuthStorage.readLatestData` are needed because public auth resolution hides these
 inputs or executes them. No host methods or configuration are patched. Unsupported
-Pi release lines and incompatible private shapes fail closed with a fixed status.
+Pi major versions, prereleases, and incompatible private shapes fail closed with a fixed status.
+Stable Pi 1.x releases are accepted without a minor-version allowlist. Runtime shape
+checks cannot detect changed auth behavior that preserves the same private shape;
+accepting future minor releases trades individual release verification for compatibility.
 This contract is covered by real-host regression and render/smoke tests.
 
 Configured `!command` provider keys, provider/model headers, and stored API keys
