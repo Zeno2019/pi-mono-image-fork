@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-13
+
 ### Fixed
 
 - Restore background usage polling on Pi 1.2.x instead of showing `[background auth unavailable]`. Accept stable Pi 1.x releases without a minor-version allowlist while retaining command-backed credential rejection and fail-closed checks for unsupported major versions, prereleases, and incompatible metadata. Verify Pi 1.1.0 and 1.2.0 with real-host integration and footer smoke tests; future 1.x releases are accepted but not individually verified.
