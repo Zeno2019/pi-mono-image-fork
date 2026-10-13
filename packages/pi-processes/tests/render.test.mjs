@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { stripVTControlCharacters } from "node:util";
+import { writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { visibleWidth } from "@earendil-works/pi-tui";
 import { ProcessOutput, renderCall, renderResult } from "../src/render.ts";
 import piProcesses from "../extensions/index.ts";
@@ -55,9 +57,15 @@ test("real Pi registered write_stdin and output tools use compact rendering with
     return Reflect.get(target, key);
   } }));
   const h = await fixture(t, { after: [capture] });
-  const launched = await h.run("exec_command", { cmd: "seq 1 200", yield_time_ms: 0 });
+  // Do not let a fast command deliver the entire buffer in the initial call:
+  // this test specifically exercises the legacy poll's registered renderer.
+  const launched = await h.run("exec_command", {
+    cmd: "while ! test -f render-ready; do sleep 0.02; done; seq 1 200", yield_time_ms: 0,
+  });
   const id = (launched.structuredContent ?? launched.details ?? JSON.parse(textOf(launched))).session_id;
-  const polled = await h.run("write_stdin", { session_id: id, yield_time_ms: 1000 });
+  assert.equal((launched.details ?? JSON.parse(textOf(launched))).status, "running");
+  await writeFile(join(h.ctx.cwd, "render-ready"), "");
+  const polled = await h.run("write_stdin", { session_id: id, yield_time_ms: 5000 });
   assert.ok(textOf(polled).includes("200"));
   const lines = registered.get("write_stdin").renderResult(polled, { expanded: false, isPartial: false }, theme).render(80);
   assert.ok(lines.length <= 6);
