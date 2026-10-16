@@ -16,8 +16,10 @@ Create and edit images without leaving [Pi](https://pi.dev).
 ## Install
 
 ```sh
-pi install npm:pi-codex-image-gen
+pi install git:github.com/Zeno2019/pi-mono-image-fork@image-gen-0.1.15-host.1
 ```
+
+This installs the fixed fork from Git; npm publication is not required. Embedded Pi hosts use the SDK package manager with application-owned storage and load their own host adapter. See [Git installation and host integration](FORK.md#git-安装与宿主装配). The unqualified npm package installs the upstream package rather than this fork.
 
 During local development from this monorepo:
 
@@ -34,7 +36,7 @@ pi -e /path/to/pi-mono/packages/pi-codex-image-gen
 To uninstall:
 
 ```sh
-pi remove npm:pi-codex-image-gen
+pi remove git:github.com/Zeno2019/pi-mono-image-fork@image-gen-0.1.15-host.1
 ```
 
 ## Quick usage
