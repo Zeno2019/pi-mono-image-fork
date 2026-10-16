@@ -8,10 +8,24 @@
 - 上游 npm tarball：<https://registry.npmjs.org/pi-codex-image-gen/-/pi-codex-image-gen-0.1.15.tgz>
 - 上游 npm integrity：`sha512-NTISK58pZCM42txUroaQUF2oR/xxRGxzO7FrU+ymc+OWY6XDplFBc/pxVkSRvOZpr2QKCc7axwbU8owK6dZxuw==`
 - 来源核验：原始 tarball 的 SHA-512 符合 npm 元数据，25 个发布文件与该 commit 逐字一致。
-- fork 归属：`Zeno2019/pi-mono-image-fork`；本地分支 `fork/pi-codex-image-gen-0.1.15-host`。远端创建、push 和发布另行处理。
+- fork 归属：`Zeno2019/pi-mono-image-fork`；源码分支 `fork/pi-codex-image-gen-0.1.15-host`，包根目录分发分支 `package/pi-codex-image-gen-0.1.15-host`。
 - 行为基线：应用原 `pi-codex-image-gen@0.1.15.patch`，SHA-256 为 `b046ff5afd4cda6213f4027070df0b3ba7ce54d684cced4cf24f2a5c5957f0c8`。
 
-包版本保留上游 `0.1.15`，`x-fork` 标识宿主接口修订 1。消费端通过 **fork commit + 仓内 tarball + lockfile integrity** 区分和固定 fork；仅写 `pi-codex-image-gen: 0.1.15` 不能安装本 fork。
+包版本保留上游 `0.1.15`，`x-fork` 标识宿主接口修订 1。消费端使用固定的 Git 分发 commit，或 **fork commit + tarball + lockfile integrity** 区分和固定 fork；仅写 `pi-codex-image-gen: 0.1.15` 不能安装本 fork。
+
+## Git 安装与宿主装配
+
+分发分支通过 `git subtree split --prefix=packages/pi-codex-image-gen` 从源码分支生成，将本目录原样放到仓库根目录，不包含其它工作区。Git tag `image-gen-0.1.15-host.1` 指向首次分发 commit；已交付的 tag 不移动。来源历史保留在源码分支和本文件中，无需发布 npm。
+
+Pi CLI 可使用以下 Git 源安装；应用交付应进一步记录 tag 对应的完整分发 commit，并用该 commit 固定依赖：
+
+```sh
+pi install git:github.com/Zeno2019/pi-mono-image-fork@image-gen-0.1.15-host.1
+```
+
+嵌入式 Pi 0.87.1 可通过同一 SDK 的 `DefaultPackageManager.install(source)` 安装，再用 `getInstalledPath(source, "user")` 获取包根目录。包管理器的 `agentDir`、工作目录和 settings 必须由应用隔离管理；安装不得操作用户全局 Pi 的配置或认证。宿主提供既有 Pi peers，Git 依赖安装应禁用自动安装 peers、开发依赖和生命周期脚本，例如为专用 settings 配置 `npmCommand: ["npm", "--omit=dev", "--legacy-peer-deps", "--ignore-scripts"]`。
+
+Git 安装负责取得包，不会自动完成应用宿主绑定。消费端继续加载自己的应用扩展，通过 Pi 扩展加载器导入包的 `extensions/host.ts`（包 export 为 `./host`），由应用注册工具、OAuth provider 并传入可信宿主。默认 `pi.extensions` 指向上游 CLI 扩展，嵌入式消费端应显式选择自己的应用扩展；受控宿主行为以 `./host` 为准。
 
 ## 本地修改边界
 
