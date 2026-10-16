@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Fork host interface
+
+- Add a generic byte-only host interface with strict image OAuth, injected transport, durable persistence callbacks, and no install telemetry or automatic image-request retries.
+- Expose existing upstream auth/request helpers with opt-in strict authentication and transport/retry controls; preserve the default CLI behavior and existing dependency versions.
+- Keep application tools, host binding, product text, and persistence-state interpretation outside the package. See `FORK.md` for the fixed upstream source and fork identity.
+
 ## [0.1.15] - 2026-10-02
 
 ### Changed

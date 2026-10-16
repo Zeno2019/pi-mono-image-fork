@@ -1,5 +1,7 @@
 # pi-codex-image-gen
 
+本副本是基于 **0.1.15** 的固定 fork，提供受控宿主接口；来源、差异和打包方式见 [FORK.md](FORK.md)。
+
 Create and edit images without leaving [Pi](https://pi.dev).
 
 `pi-codex-image-gen` turns natural-language requests and reference images into PNG, JPEG, or WebP assets through **ChatGPT subscription image generation**. Sign in from Pi; no Codex app or separate API key is required.
@@ -161,6 +163,16 @@ Project config overrides global config only when project trust is active. If pro
 | 429 response | Rate limited | Wait and retry; the extension retries automatically with backoff |
 | "Codex did not return an image" | Backend refused the prompt | Rephrase the prompt and try again |
 | "save=custom requires saveDir" | Missing config | Set `saveDir` in config or `PI_CODEX_IMAGE_SAVE_DIR` env var |
+
+## 受控宿主接口（fork）
+
+从 `pi-codex-image-gen/host` 导入 `createHostedImageGenerator`、`HostedImageHost<Result>` 和 `imageAuthProvider`。消费端负责注册 OAuth provider 与自己的工具、绑定可信宿主，并通过 `prepare → authenticate → beforeRequest → HTTP → persist` 执行一次调用。
+
+`prepare` 只提供授权参考图字节；`persist` 接收已验证的结果字节并返回消费端定义的回执。执行结果包含 `operationId`、`bytes`、`data`（base64）、`mimeType`、`responseId`、`imageGenerationId` 和 `persisted`，不解释产品状态。参数仅接受 `prompt` 和可选 `outputFormat`。
+
+宿主入口只使用 `codex-images` OAuth，不读取插件配置或文件路径，不发送 install telemetry，不自动重试图片请求。成功图片会等待宿主持久化完成，取消不会中断该阶段。上游默认 CLI 入口仍保留自身配置、保存和认证兼容行为。
+
+包沿用上游 TypeScript 源码分发方式，应由 Pi 的扩展加载器加载；Electron 的应用扩展可由 `DefaultResourceLoader.additionalExtensionPaths` 指向应用编译后的扩展文件，再在该扩展内导入 `./host`。
 
 ## License
 
