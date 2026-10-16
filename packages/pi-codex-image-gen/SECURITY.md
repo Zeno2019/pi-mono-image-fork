@@ -1,5 +1,9 @@
 # Security Policy
 
+## Fork 宿主入口
+
+本 fork 的 `./host` 只提供受控字节执行接口，默认严格使用 `codex-images` OAuth，拒绝 legacy-only registry、非 OAuth 认证和账户回退；不读取插件配置、路径或 Codex app 凭据。它不注册工具、不调用 install telemetry，图片 HTTP 固定零自动重试。可信宿主负责参考图授权、请求前门禁和结果持久化，成功图片不因随后取消而放弃保存。可选认证/HTTP 注入仅为可信代码接缝，不是用户配置。其余上游入口仍遵守下述原安全模型；来源和修改记录见 `FORK.md`。
+
 ## Supported versions
 
 Security fixes are provided for the latest released version of `pi-codex-image-gen`.

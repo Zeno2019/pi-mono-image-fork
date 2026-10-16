@@ -4,6 +4,7 @@
  * Registers `codex_generate_image`, a tool that uses package-owned
  * ChatGPT image OAuth or legacy Pi auth to call the Codex Responses backend with the
  * native `image_generation` tool. The backend selects the image model.
+ * Fork modification: expose strict auth and request transport/retry controls for hosts.
  */
 
 import { readFileSync } from "node:fs";
@@ -143,8 +144,10 @@ interface ImageAuth {
 	accountId: string;
 }
 
-async function resolveImageAuth(registry: ExtensionContext["modelRegistry"]): Promise<ImageAuth> {
-	for (const provider of [IMAGE_AUTH_PROVIDER, LEGACY_PROVIDER] as const) {
+export async function resolveImageAuth(registry: ExtensionContext["modelRegistry"], allowLegacy = true): Promise<ImageAuth> {
+	if (!allowLegacy && typeof registry.getProviderAuth !== "function") throw new Error("Image authentication requires OAuth provider credentials.");
+	const providers = allowLegacy ? [IMAGE_AUTH_PROVIDER, LEGACY_PROVIDER] as const : [IMAGE_AUTH_PROVIDER] as const;
+	for (const provider of providers) {
 		let token: string | undefined;
 		try {
 			if (typeof registry.getProviderAuth === "function") {
@@ -408,7 +411,7 @@ export function buildRequestBody(
 
 // --- #1: requestImage with retry + backoff + jitter ---
 
-async function requestImage(
+export async function requestImage(
 	params: ToolParams,
 	auth: ImageAuth,
 	model: string,
@@ -417,7 +420,10 @@ async function requestImage(
 	inputImages: InputImage[],
 	signal?: AbortSignal,
 	onProgress?: (stage: string) => void,
+	options: { fetch?: typeof fetch; maxRetries?: number } = {},
 ): Promise<ParsedCodexResponse> {
+	const requestFetch = options.fetch ?? fetch;
+	const maxRetries = options.maxRetries ?? MAX_RETRIES;
 	const body = JSON.stringify(buildRequestBody(params, model, outputFormat, sessionId, inputImages));
 	const headers: Record<string, string> = {
 		Authorization: `Bearer ${auth.token}`,
@@ -430,11 +436,11 @@ async function requestImage(
 	};
 
 	return withRequestDeadline(signal, async (signal) => {
-		for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
+		for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
 			signal.throwIfAborted();
 			let response: Response;
 			try {
-				response = await abortable(fetch(CODEX_RESPONSES_URL, {
+				response = await abortable(requestFetch(CODEX_RESPONSES_URL, {
 					method: "POST", headers, body, signal, redirect: "error",
 				}), signal);
 			} catch {
@@ -444,7 +450,7 @@ async function requestImage(
 
 			if (!response.ok) {
 				const failure = await httpFailure(response, signal);
-				if (attempt <= MAX_RETRIES && failure.retry) {
+				if (attempt <= maxRetries && failure.retry) {
 					const delay = retryDelayMs(attempt, response.headers.get("retry-after"));
 					await abortableDelay(delay, signal);
 					continue;

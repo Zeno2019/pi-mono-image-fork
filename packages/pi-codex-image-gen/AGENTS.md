@@ -9,6 +9,7 @@ Root `AGENTS.md` applies.
 - Keep the OAuth implementation independent of Pi's legacy OAuth helpers. Validate PKCE/state, honor cancellation, bound token responses, and do not switch accounts after an auth failure.
 - Treat `skills/imagegen/scripts/image_gen.py` as vendored; preserve attribution and avoid casual edits.
 - Preserve save modes and config keys unless making an explicit breaking change.
+- Fork `./host` is separate from the default CLI entry: keep its byte-only interface generic, strict `codex-images` OAuth, no telemetry, and zero automatic image-request retries. Application tools, host binding, and product states belong to consumers. Preserve the fixed 0.1.15 source provenance in `FORK.md`.
 
 ## Validation
 

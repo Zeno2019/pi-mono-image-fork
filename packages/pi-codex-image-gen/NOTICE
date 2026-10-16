@@ -18,3 +18,10 @@ The following files are vendored from the OpenAI Codex imagegen skill and remain
 - skills/imagegen/LICENSE.txt
 - skills/imagegen/assets/imagegen-small.svg
 - skills/imagegen/assets/imagegen.png
+
+Fork host-interface modifications (2026-10-16):
+Based on jvm/pi-mono, pi-codex-image-gen@0.1.15,
+commit 8dcf8a03e86ae5f20a89a2d5983a5fd0258bd6d6.
+Fork attribution: https://github.com/Zeno2019/pi-mono-image-fork
+The generic host interface and helper export/transport changes are described in FORK.md.
+The original Apache-2.0 license and all upstream attributions remain applicable.

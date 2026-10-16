@@ -1,6 +1,11 @@
 {
   "name": "pi-codex-image-gen",
   "version": "0.1.15",
+  "x-fork": {
+    "repository": "https://github.com/Zeno2019/pi-mono-image-fork",
+    "upstreamCommit": "8dcf8a03e86ae5f20a89a2d5983a5fd0258bd6d6",
+    "hostInterface": 1
+  },
   "description": "Image generation and editing for Pi using your ChatGPT Codex login.",
   "type": "module",
   "license": "Apache-2.0",
@@ -23,7 +28,8 @@
     "gpt-image-2"
   ],
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./host": "./extensions/host.ts"
   },
   "files": [
     "index.ts",
@@ -36,7 +42,8 @@
     "CHANGELOG.md",
     "SECURITY.md",
     "CONTRIBUTING.md",
-    "CODE_OF_CONDUCT.md"
+    "CODE_OF_CONDUCT.md",
+    "FORK.md"
   ],
   "scripts": {
     "check": "tsc --noEmit",
